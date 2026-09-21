@@ -61,6 +61,7 @@
   let panelControls = [];
   let journeyState = 'idle';
   let destinationChapter = -1;
+  let layoutWidth = innerWidth;
 
   const scrollAssist = window.CultivarStoryScroll?.create({
     getGeometry: () => ({ start, stride: chapterStride, count: panels.length }),
@@ -315,8 +316,16 @@
   }
 
   function onResize() {
-    scrollAssist?.cancel();
+    const previousStart = start;
+    const previousStride = chapterStride;
+    const widthChanged = layoutWidth !== innerWidth;
     measure();
+    layoutWidth = innerWidth;
+    // Address/navigation bars changing height must not cancel an in-flight
+    // swipe or forget that this finger already consumed its chapter gesture.
+    if (widthChanged || Math.abs(start - previousStart) > 1 || Math.abs(chapterStride - previousStride) > 1) {
+      scrollAssist?.cancel();
+    }
     queue();
   }
 

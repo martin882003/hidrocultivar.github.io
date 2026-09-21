@@ -208,8 +208,15 @@
     }, { passive: true });
     addEventListener('touchcancel', () => { touch = null; settleEntry(); }, { passive: true });
     addEventListener('pointerdown', event => { if (event.pointerType !== 'touch') cancel(); }, { passive: true });
-    addEventListener('click', cancel, { capture: true });
-    addEventListener('resize', cancel);
+    addEventListener('click', event => {
+      // A resting finger can synthesize a click on empty content. Only actual
+      // controls should interrupt a chapter; otherwise it stops mid-sentence.
+      if (event.target instanceof Element && event.target.closest(
+        'a[href], button, input, textarea, select, summary, [role="button"], [role="link"], [contenteditable]'
+      )) cancel();
+    }, { capture: true });
+    // The host checks whether the narrative geometry actually changed. Mobile
+    // browser bars can resize the viewport without changing chapter positions.
     addEventListener('blur', cancel);
     addEventListener('pagehide', cancel);
     document.addEventListener('visibilitychange', cancel);
