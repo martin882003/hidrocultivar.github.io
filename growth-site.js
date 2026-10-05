@@ -7,7 +7,8 @@
     let frame = 0;
     const update = () => {
       frame = 0;
-      backToTop.hidden = scrollY < Math.max(240, innerHeight * .6);
+      const footer = document.querySelector('.site-footer');
+      backToTop.hidden = scrollY < Math.max(240, innerHeight * .6) || Boolean(footer && footer.getBoundingClientRect().top < innerHeight);
       const story = document.querySelector('.growth-story.story-ready');
       backToTop.classList.toggle('is-over-story', Boolean(story && story.getBoundingClientRect().bottom >= innerHeight));
     };
